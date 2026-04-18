@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wushlaundry/widgets/app_bottom_nav_bar.dart';
 import '../constants/app_colors.dart';
+import '../widgets/login_modal_sheet.dart';
 import 'home_screen.dart';
 import 'my_orders_screen.dart';
 import 'services_screen.dart';
@@ -38,28 +39,50 @@ class _MainShellScreenState
     loadUser();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    loadUser();
+  }
+
   Future<
     void
   >
   loadUser() async {
     final prefs = await SharedPreferences.getInstance();
 
-    setState(
-      () {
-        loggedIn =
-            prefs.getBool(
-              'isLoggedIn',
-            ) ??
-            false;
-        userFirstName = prefs.getString(
-          'userName',
-        );
-      },
+    final isLogin =
+        prefs.getBool(
+          'isLoggedIn',
+        ) ??
+        false;
+    final name = prefs.getString(
+      'userName',
     );
+
+    if (mounted &&
+        (isLogin !=
+                loggedIn ||
+            name !=
+                userFirstName)) {
+      setState(
+        () {
+          loggedIn = isLogin;
+          userFirstName = name;
+        },
+      );
+    }
   }
 
-  // ================= NAVIGATION =================
-  void _openNotifications() {
+  // ================= LOGIN CHECK NOTIF =================
+  void _handleNotificationTap() {
+    if (!loggedIn) {
+      showLoginModal(
+        context,
+      );
+      return;
+    }
+
     Navigator.pushNamed(
       context,
       '/notifications',
@@ -84,7 +107,7 @@ class _MainShellScreenState
     Navigator.pushNamed(
       context,
       '/pro',
-    ); // ✅ FIX PRO NAVIGATION
+    );
   }
 
   @override
@@ -93,24 +116,39 @@ class _MainShellScreenState
   ) {
     return Scaffold(
       backgroundColor: AppColors.pageBg,
+
       body: IndexedStack(
         index: _index,
         children: [
           HomeScreen(
             loggedIn: loggedIn,
             userFirstName: userFirstName,
-
-            onOpenNotifications: _openNotifications,
+            onOpenNotifications: _handleNotificationTap,
             onOpenServices: _openServices,
             onOpenServiceDetail: _openServiceDetail,
-            onOpenPro: _openPro, // ✅ INI WAJIB ADA
+            onOpenPro: _openPro,
           ),
+
           const MyOrdersScreen(),
-          const ServicesScreen(),
-          const OffersScreen(),
-          const ProfileScreen(),
+
+          ServicesScreen(
+            loggedIn: loggedIn,
+            onOpenNotifications: _handleNotificationTap,
+          ),
+
+          OffersScreen(
+            loggedIn: loggedIn,
+            onOpenNotifications: _handleNotificationTap,
+          ),
+
+          ProfileScreen(
+            key: ValueKey(
+              loggedIn,
+            ),
+          ),
         ],
       ),
+
       bottomNavigationBar: AppBottomNavBar(
         currentIndex: _index,
         onTap:

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:wushlaundry/widgets/active_order_card.dart';
 import 'package:wushlaundry/widgets/eta_badge.dart';
@@ -12,7 +13,7 @@ import '../constants/app_text_styles.dart';
 
 class HomeScreen
     extends
-        StatelessWidget {
+        StatefulWidget {
   const HomeScreen({
     super.key,
     this.loggedIn = false,
@@ -30,17 +31,143 @@ class HomeScreen
   final VoidCallback? onOpenServiceDetail;
   final VoidCallback? onOpenPro;
 
+  @override
+  State<
+    HomeScreen
+  >
+  createState() => _HomeScreenState();
+}
+
+class _HomeScreenState
+    extends
+        State<
+          HomeScreen
+        > {
+  final PageController _controller = PageController(
+    viewportFraction: 0.45,
+  );
+
+  int _currentIndex = 0;
+  Timer? _timer;
+
+  final List<
+    Map<
+      String,
+      dynamic
+    >
+  >
+  items = [
+    {
+      'title': 'Cuci Regular',
+      'price': 'Rp 20.000/plastik',
+      'eta': 'ETA 10 jam',
+      'type': EtaType.normal,
+    },
+    {
+      'title': 'Cuci Setrika',
+      'price': 'Rp 25.000/plastik',
+      'eta': 'ETA 11 jam',
+      'type': EtaType.fast,
+    },
+    {
+      'title': 'Cuci Kering',
+      'price': 'Rp 23.000/plastik',
+      'eta': 'ETA 12 jam',
+      'type': EtaType.long,
+    },
+    {
+      'title': 'Paket Layanan',
+      'price': 'Rp 48.000/plastik',
+      'eta': 'Express',
+      'type': EtaType.fast,
+    },
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    _timer = Timer.periodic(
+      const Duration(
+        seconds: 3,
+      ),
+      (
+        _,
+      ) {
+        if (!_controller.hasClients) return;
+
+        final next =
+            (_currentIndex +
+                1) %
+            items.length;
+
+        _controller.animateToPage(
+          next,
+          duration: const Duration(
+            milliseconds: 400,
+          ),
+          curve: Curves.easeInOut,
+        );
+
+        setState(
+          () {
+            _currentIndex = next;
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _controller.dispose();
+    super.dispose();
+  }
+
   void _handleServiceTap(
     BuildContext context,
-    VoidCallback? onSuccess,
   ) {
-    if (!loggedIn) {
+    if (!widget.loggedIn) {
       showLoginModal(
         context,
       );
       return;
     }
-    onSuccess?.call();
+    widget.onOpenServiceDetail?.call();
+  }
+
+  void _handleNotificationTap(
+    BuildContext context,
+  ) {
+    if (!widget.loggedIn) {
+      showLoginModal(
+        context,
+      );
+      return;
+    }
+    widget.onOpenNotifications?.call();
+  }
+
+  void _handleOfferTap(
+    BuildContext context,
+    int index,
+  ) {
+    if (!widget.loggedIn) {
+      showLoginModal(
+        context,
+      );
+      return;
+    }
+    if (index ==
+        0) {
+      widget.onOpenPro?.call();
+    } else {
+      Navigator.pushNamed(
+        context,
+        '/offers-full',
+      );
+    }
   }
 
   @override
@@ -52,8 +179,9 @@ class HomeScreen
       child: Column(
         children: [
           HomeNavyHeaderBlock(
-            onSearch: onOpenServices,
-            onNotification: onOpenNotifications,
+            onNotification: () => _handleNotificationTap(
+              context,
+            ),
           ),
 
           Expanded(
@@ -65,139 +193,120 @@ class HomeScreen
                 AppSpacing.xl,
                 8,
               ),
-              child: SingleChildScrollView(
-                physics: const ClampingScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (loggedIn &&
-                        userFirstName !=
-                            null) ...[
-                      Text(
-                        'Hi $userFirstName 👋',
-                        style: AppTextStyles.screenTitleNavy.copyWith(
-                          fontSize: 18,
+
+              /// ✅ FIX SCROLL DI SINI
+              child: ScrollConfiguration(
+                behavior: const _NoOverscrollBehavior(),
+                child: SingleChildScrollView(
+                  physics: const ClampingScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (widget.loggedIn &&
+                          widget.userFirstName !=
+                              null) ...[
+                        Text(
+                          'Hi ${widget.userFirstName} 👋',
+                          style: AppTextStyles.screenTitleNavy.copyWith(
+                            fontSize: 18,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 6,
+                        ),
+                      ],
+
+                      const SectionHeaderRow(
+                        title: 'Layanan Laundry Kami',
+                      ),
+
+                      const SizedBox(
+                        height: 12,
+                      ),
+
+                      SizedBox(
+                        height: 140,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          physics: const BouncingScrollPhysics(),
+                          itemCount: items.length,
+                          itemBuilder:
+                              (
+                                context,
+                                index,
+                              ) {
+                                final item = items[index];
+
+                                return Padding(
+                                  padding: const EdgeInsets.only(
+                                    right: 12,
+                                  ),
+                                  child: ServiceCardCompact(
+                                    title: item['title'],
+                                    priceLabel: item['price'],
+                                    etaLabel: item['eta'],
+                                    etaType: item['type'],
+                                    selected:
+                                        _currentIndex ==
+                                        index,
+                                    onTap: () => _handleServiceTap(
+                                      context,
+                                    ),
+                                  ),
+                                );
+                              },
                         ),
                       ),
+
                       const SizedBox(
-                        height: 6,
+                        height: AppSpacing.xl,
+                      ),
+
+                      const SectionHeaderRow(
+                        title: 'Pesanan Aktif',
+                      ),
+
+                      const SizedBox(
+                        height: 12,
+                      ),
+
+                      /// 🔥 NANTI BISA GANTI JADI DINAMIS
+                      const ActiveOrderCard(
+                        empty: true,
+                        statusTitle: '',
+                        subtitle: '',
+                        currentStep: 0,
+                        onTap: null,
+                      ),
+
+                      const SizedBox(
+                        height: AppSpacing.xl,
+                      ),
+
+                      SectionHeaderRow(
+                        title: 'Penawaran Khusus',
+                        actionLabel: 'Lihat semua',
+                        onAction: () => _handleOfferTap(
+                          context,
+                          1,
+                        ),
+                      ),
+
+                      OfferImageAutoSlider(
+                        onTap:
+                            (
+                              index,
+                            ) => _handleOfferTap(
+                              context,
+                              index,
+                            ),
+                      ),
+
+                      const SizedBox(
+                        height: 24,
                       ),
                     ],
-
-                    // ================= LAYANAN =================
-                    SectionHeaderRow(
-                      title: 'Layanan Laundry Kami',
-                      actionLabel: 'Lihat semua',
-                      onAction: onOpenServices,
-                    ),
-
-                    const SizedBox(
-                      height: 12,
-                    ),
-
-                    SizedBox(
-                      height: 128,
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        physics: const ClampingScrollPhysics(),
-                        children: [
-                          ServiceCardCompact(
-                            title: 'Cuci Regular',
-                            priceLabel: 'Rp 20.000/plastik',
-                            etaLabel: 'ETA 10 jam',
-                            etaType: EtaType.normal,
-                            selected: true,
-                            onTap: () => _handleServiceTap(
-                              context,
-                              onOpenServiceDetail,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 12,
-                          ),
-                          ServiceCardCompact(
-                            title: 'Cuci Setrika',
-                            priceLabel: 'Rp 25.000/plastik',
-                            etaLabel: 'ETA 11 jam',
-                            etaType: EtaType.fast,
-                            onTap: () => _handleServiceTap(
-                              context,
-                              onOpenServiceDetail,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 12,
-                          ),
-                          ServiceCardCompact(
-                            title: 'Cuci Kering',
-                            priceLabel: 'Rp 23.000/plastik',
-                            etaLabel: 'ETA 12 jam',
-                            etaType: EtaType.long, // ⚠️ pastikan ada di enum EtaType
-                            onTap: () => _handleServiceTap(
-                              context,
-                              onOpenServiceDetail,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: AppSpacing.xl,
-                    ),
-
-                    // ================= PESANAN =================
-                    const SectionHeaderRow(
-                      title: 'Pesanan Aktif',
-                    ),
-
-                    const SizedBox(
-                      height: 12,
-                    ),
-
-                    ActiveOrderCard(
-                      empty: true,
-                      statusTitle: '',
-                      subtitle: '',
-                      currentStep: 0,
-                      onTap: null,
-                    ),
-
-                    const SizedBox(
-                      height: AppSpacing.xl,
-                    ),
-
-                    // ================= PENAWARAN =================
-                    SectionHeaderRow(
-                      title: 'Penawaran Khusus',
-                      actionLabel: 'Lihat semua',
-                      onAction: () => Navigator.pushNamed(
-                        context,
-                        '/offers-full',
-                      ),
-                    ),
-
-                    OfferImageAutoSlider(
-                      onTap:
-                          (
-                            index,
-                          ) {
-                            if (index ==
-                                0) {
-                              onOpenPro?.call();
-                            } else {
-                              Navigator.pushNamed(
-                                context,
-                                '/offers-full',
-                              );
-                            }
-                          },
-                    ),
-
-                    const SizedBox(
-                      height: 24,
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -208,17 +317,15 @@ class HomeScreen
   }
 }
 
-/// ================= HEADER =================
+// ================= HEADER =================
 class HomeNavyHeaderBlock
     extends
         StatelessWidget {
   const HomeNavyHeaderBlock({
     super.key,
-    this.onSearch,
     this.onNotification,
   });
 
-  final VoidCallback? onSearch;
   final VoidCallback? onNotification;
 
   @override
@@ -246,13 +353,6 @@ class HomeNavyHeaderBlock
           ),
           const Spacer(),
           IconButton(
-            onPressed: onSearch,
-            icon: const Icon(
-              Icons.search,
-              color: Colors.white,
-            ),
-          ),
-          IconButton(
             onPressed: onNotification,
             icon: const Icon(
               Icons.notifications_none_rounded,
@@ -262,5 +362,28 @@ class HomeNavyHeaderBlock
         ],
       ),
     );
+  }
+}
+
+// ================= NO OVERSCROLL =================
+class _NoOverscrollBehavior
+    extends
+        ScrollBehavior {
+  const _NoOverscrollBehavior();
+
+  @override
+  Widget buildOverscrollIndicator(
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) {
+    return child;
+  }
+
+  @override
+  ScrollPhysics getScrollPhysics(
+    BuildContext context,
+  ) {
+    return const ClampingScrollPhysics();
   }
 }

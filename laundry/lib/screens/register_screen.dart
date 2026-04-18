@@ -29,7 +29,6 @@ class _RegisterScreenState
   bool _obscure1 = true;
   bool _obscure2 = true;
 
-  // ✅ TAMBAHAN (TIDAK MENGUBAH UI)
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
 
@@ -56,7 +55,6 @@ class _RegisterScreenState
       return;
     }
 
-    // ✅ SIMPAN DATA
     await prefs.setBool(
       'isLoggedIn',
       true,
@@ -91,146 +89,143 @@ class _RegisterScreenState
             heightFraction: 0.32,
             subtitle: 'Daftar untuk pengalaman laundry yang lebih personal dan praktis',
           ),
+
           Expanded(
             child: Transform.translate(
               offset: const Offset(
                 0,
                 -28,
               ),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.xl,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    /// ✅ NAMA (DITAMBAH CONTROLLER)
-                    LabeledTextField(
-                      label: 'Nama Lengkap',
-                      hint: 'Masukkan Nama Lengkap',
-                      prefixIcon: Icons.person_outline_rounded,
-                      controller: nameController,
-                    ),
 
-                    const SizedBox(
-                      height: AppSpacing.lg,
-                    ),
+              // ================= SAME SCROLL AS HOME =================
+              child: ScrollConfiguration(
+                behavior: const _NoOverscrollBehavior(),
+                child: SingleChildScrollView(
+                  physics: const ClampingScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xl,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      LabeledTextField(
+                        label: 'Nama Lengkap',
+                        hint: 'Masukkan Nama Lengkap',
+                        prefixIcon: Icons.person_outline_rounded,
+                        controller: nameController,
+                      ),
 
-                    /// ✅ EMAIL (DITAMBAH CONTROLLER)
-                    LabeledTextField(
-                      label: 'Email',
-                      hint: 'Masukkan Email',
-                      prefixIcon: Icons.email_outlined,
-                      keyboardType: TextInputType.emailAddress,
-                      controller: emailController,
-                    ),
+                      const SizedBox(
+                        height: AppSpacing.lg,
+                      ),
 
-                    const SizedBox(
-                      height: AppSpacing.lg,
-                    ),
+                      LabeledTextField(
+                        label: 'Email',
+                        hint: 'Masukkan Email',
+                        prefixIcon: Icons.email_outlined,
+                        keyboardType: TextInputType.emailAddress,
+                        controller: emailController,
+                      ),
 
-                    /// ❌ TIDAK DIUBAH
-                    LabeledTextField(
-                      label: 'Alamat',
-                      hint: 'Masukkan Alamat',
-                      prefixIcon: Icons.location_on_outlined,
-                      maxLines: 3,
-                    ),
+                      const SizedBox(
+                        height: AppSpacing.lg,
+                      ),
 
-                    const SizedBox(
-                      height: AppSpacing.lg,
-                    ),
+                      LabeledTextField(
+                        label: 'Alamat',
+                        hint: 'Masukkan Alamat',
+                        prefixIcon: Icons.location_on_outlined,
+                        maxLines: 3,
+                      ),
 
-                    /// ❌ INI SAMA PERSIS, TIDAK DIUBAH
-                    _phoneField(),
+                      const SizedBox(
+                        height: AppSpacing.lg,
+                      ),
 
-                    const SizedBox(
-                      height: AppSpacing.lg,
-                    ),
+                      _phoneField(),
 
-                    LabeledTextField(
-                      label: 'Password',
-                      hint: 'Masukkan Password',
-                      prefixIcon: Icons.lock_outline_rounded,
-                      obscure: _obscure1,
-                      suffix: IconButton(
-                        onPressed: () => setState(
-                          () => _obscure1 = !_obscure1,
-                        ),
-                        icon: Icon(
-                          _obscure1
-                              ? Icons.visibility_off_outlined
-                              : Icons.visibility_outlined,
-                          color: AppColors.textSecondary,
+                      const SizedBox(
+                        height: AppSpacing.lg,
+                      ),
+
+                      LabeledTextField(
+                        label: 'Password',
+                        hint: 'Masukkan Password',
+                        prefixIcon: Icons.lock_outline_rounded,
+                        obscure: _obscure1,
+                        suffix: IconButton(
+                          onPressed: () => setState(
+                            () => _obscure1 = !_obscure1,
+                          ),
+                          icon: Icon(
+                            _obscure1
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ),
-                    ),
 
-                    const SizedBox(
-                      height: AppSpacing.lg,
-                    ),
+                      const SizedBox(
+                        height: AppSpacing.lg,
+                      ),
 
-                    LabeledTextField(
-                      label: 'Konfirmasi Password',
-                      hint: 'Masukkan Konfirmasi Password',
-                      prefixIcon: Icons.lock_outline_rounded,
-                      obscure: _obscure2,
-                      suffix: IconButton(
-                        onPressed: () => setState(
-                          () => _obscure2 = !_obscure2,
-                        ),
-                        icon: Icon(
-                          _obscure2
-                              ? Icons.visibility_off_outlined
-                              : Icons.visibility_outlined,
-                          color: AppColors.textSecondary,
+                      LabeledTextField(
+                        label: 'Konfirmasi Password',
+                        hint: 'Masukkan Konfirmasi Password',
+                        prefixIcon: Icons.lock_outline_rounded,
+                        obscure: _obscure2,
+                        suffix: IconButton(
+                          onPressed: () => setState(
+                            () => _obscure2 = !_obscure2,
+                          ),
+                          icon: Icon(
+                            _obscure2
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ),
-                    ),
 
-                    const SizedBox(
-                      height: AppSpacing.xxl,
-                    ),
+                      const SizedBox(
+                        height: AppSpacing.xxl,
+                      ),
 
-                    /// 🔥 CUMA INI DIGANTI LOGIC NYA
-                    PrimaryButton(
-                      label: 'Daftar',
-                      onPressed: handleRegister,
-                    ),
+                      PrimaryButton(
+                        label: 'Daftar',
+                        onPressed: handleRegister,
+                      ),
 
-                    const SizedBox(
-                      height: AppSpacing.xxl,
-                    ),
+                      const SizedBox(
+                        height: AppSpacing.xxl,
+                      ),
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Sudah punya akun? ',
-                          style: AppTextStyles.bodyMuted,
-                        ),
-                        TextButton(
-                          onPressed: () => Navigator.pushReplacementNamed(
-                            context,
-                            '/login',
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Sudah punya akun? ',
+                            style: AppTextStyles.bodyMuted,
                           ),
-                          style: TextButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                            minimumSize: Size.zero,
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          TextButton(
+                            onPressed: () => Navigator.pushReplacementNamed(
+                              context,
+                              '/login',
+                            ),
+                            child: Text(
+                              'Masuk',
+                              style: AppTextStyles.link,
+                            ),
                           ),
-                          child: Text(
-                            'Masuk',
-                            style: AppTextStyles.link,
-                          ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
 
-                    const SizedBox(
-                      height: 32,
-                    ),
-                  ],
+                      const SizedBox(
+                        height: 32,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -240,7 +235,6 @@ class _RegisterScreenState
     );
   }
 
-  // ❌ TIDAK DIUBAH SAMA SEKALI
   Widget _phoneField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -274,21 +268,10 @@ class _RegisterScreenState
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
-                    width: 28,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(
-                        3,
-                      ),
-                      gradient: const LinearGradient(
-                        colors: [
-                          Color(
-                            0xFFE53935,
-                          ),
-                          Colors.white,
-                        ],
-                      ),
+                  const Text(
+                    '🇮🇩',
+                    style: TextStyle(
+                      fontSize: 18,
                     ),
                   ),
                   const SizedBox(
@@ -352,5 +335,28 @@ class _RegisterScreenState
         ),
       ],
     );
+  }
+}
+
+// ================= SAME AS HOME =================
+class _NoOverscrollBehavior
+    extends
+        ScrollBehavior {
+  const _NoOverscrollBehavior();
+
+  @override
+  Widget buildOverscrollIndicator(
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) {
+    return child;
+  }
+
+  @override
+  ScrollPhysics getScrollPhysics(
+    BuildContext context,
+  ) {
+    return const ClampingScrollPhysics();
   }
 }

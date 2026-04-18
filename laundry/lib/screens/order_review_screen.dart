@@ -7,88 +7,199 @@ import '../widgets/navy_app_bar.dart';
 import '../widgets/rounded_white_panel.dart';
 import '../widgets/service_summary_tile.dart';
 
-class OrderReviewScreen extends StatefulWidget {
-  const OrderReviewScreen({super.key});
+class OrderReviewScreen
+    extends
+        StatefulWidget {
+  const OrderReviewScreen({
+    super.key,
+  });
 
   @override
-  State<OrderReviewScreen> createState() => _OrderReviewScreenState();
+  State<
+    OrderReviewScreen
+  >
+  createState() => _OrderReviewScreenState();
 }
 
-class _OrderReviewScreenState extends State<OrderReviewScreen> {
+class _OrderReviewScreenState
+    extends
+        State<
+          OrderReviewScreen
+        > {
   bool _payLoading = false;
 
+  String _formatRp(
+    dynamic value,
+  ) {
+    final v =
+        (value ??
+                0)
+            .toString();
+    return 'Rp $v';
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
+    final args =
+        (ModalRoute.of(
+              context,
+            )?.settings.arguments
+            as Map?) ??
+        {};
+
     return Scaffold(
       backgroundColor: AppColors.headerNavy,
       appBar: NavyBackAppBar(
         title: 'Tinjau Pesanan',
-        onBack: () => Navigator.pop(context),
+        onBack: () => Navigator.pop(
+          context,
+        ),
       ),
       body: Column(
         children: [
-          const SizedBox(height: 8),
+          const SizedBox(
+            height: 8,
+          ),
           Expanded(
             child: RoundedWhitePanel(
               topRadius: AppSpacing.sheetTopRadius,
-              padding: const EdgeInsets.all(AppSpacing.xl),
+              padding: const EdgeInsets.all(
+                AppSpacing.xl,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ServiceSummaryTile(
-                    title: 'Cuci regular',
-                    priceLabel: 'Rp 20.000 / Plastik',
-                    onEdit: () => Navigator.pop(context),
+                    title:
+                        args['service'] ??
+                        'Service',
+                    priceLabel: 'Rp ${args['price'] ?? 0} / Plastik',
+                    onEdit: () => Navigator.pop(
+                      context,
+                    ),
                   ),
-                  const Divider(height: 32),
-                  const InfoKvRow(
+
+                  const Divider(
+                    height: 32,
+                  ),
+
+                  InfoKvRow(
                     label: 'Waktu Pengambilan',
-                    value: 'Hari ini, 10.00 AM',
+                    value:
+                        args['pickupTime'] ??
+                        '-',
                     valueBold: true,
                   ),
-                  const InfoKvRow(
+
+                  InfoKvRow(
                     label: 'Waktu Pengiriman',
-                    value: 'Besok, 12.00 PM',
+                    value:
+                        args['deliveryTime'] ??
+                        '-',
                     valueBold: true,
                   ),
-                  const InfoKvRow(
+
+                  InfoKvRow(
                     label: 'Alamat Pengiriman',
-                    value: 'Jln. Matahari no. 456',
+                    value:
+                        args['address'] ??
+                        '-',
                     valueBold: true,
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text('Detail Pembayaran:', style: AppTextStyles.sectionTitle.copyWith(fontSize: 14)),
-                  const InfoKvRow(label: 'Biaya Layanan', value: 'Rp 20.000'),
-                  const InfoKvRow(label: 'Biaya Pengiriman', value: 'Rp 5.000'),
-                  const InfoKvRow(label: 'Kode Promo', value: '-'),
-                  const InfoKvRow(label: 'Total Pembayaran', value: 'Rp 25.000', valueBold: true),
+
+                  const SizedBox(
+                    height: AppSpacing.lg,
+                  ),
+
+                  Text(
+                    'Detail Pembayaran:',
+                    style: AppTextStyles.sectionTitle.copyWith(
+                      fontSize: 14,
+                    ),
+                  ),
+
+                  InfoKvRow(
+                    label: 'Biaya Layanan',
+                    value: _formatRp(
+                      args['serviceFee'],
+                    ),
+                  ),
+
+                  InfoKvRow(
+                    label: 'Biaya Pengiriman',
+                    value: _formatRp(
+                      args['deliveryFee'],
+                    ),
+                  ),
+
+                  InfoKvRow(
+                    label: 'Kode Promo',
+                    value: '-',
+                  ),
+
+                  InfoKvRow(
+                    label: 'Total Pembayaran',
+                    value: _formatRp(
+                      args['total'],
+                    ),
+                    valueBold: true,
+                  ),
+
                   const Spacer(),
+
                   SizedBox(
                     width: double.infinity,
                     height: 52,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.inputFill,
-                        foregroundColor: AppColors.headerNavy,
+                        backgroundColor: AppColors.headerNavy,
+                        foregroundColor: Colors.white,
                         elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.buttonRadius)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.buttonRadius,
+                          ),
+                        ),
                       ),
                       onPressed: _payLoading
                           ? null
                           : () async {
-                              setState(() => _payLoading = true);
-                              await Future<void>.delayed(const Duration(milliseconds: 600));
+                              setState(
+                                () => _payLoading = true,
+                              );
+
+                              await Future.delayed(
+                                const Duration(
+                                  milliseconds: 600,
+                                ),
+                              );
+
                               if (!context.mounted) return;
-                              setState(() => _payLoading = false);
-                              Navigator.pushNamed(context, '/payment');
+
+                              setState(
+                                () => _payLoading = false,
+                              );
+
+                              Navigator.pushNamed(
+                                context,
+                                '/payment', // ✅ FIX
+                                arguments: args,
+                              );
                             },
                       child: _payLoading
-                          ? const SizedBox(
-                              width: 22,
-                              height: 22,
-                              child: CircularProgressIndicator(strokeWidth: 2),
+                          ? const CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
                             )
-                          : Text('Bayar', style: AppTextStyles.sectionTitle.copyWith(fontSize: 16)),
+                          : Text(
+                              'Bayar',
+                              style: AppTextStyles.sectionTitle.copyWith(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
                     ),
                   ),
                 ],

@@ -3,40 +3,73 @@ import '../constants/app_colors.dart';
 import '../constants/app_spacing.dart';
 import '../constants/app_text_styles.dart';
 import '../widgets/navy_app_bar.dart';
-import '../widgets/search_field_rounded.dart';
+import '../widgets/login_modal_sheet.dart';
 
-class OffersScreen extends StatelessWidget {
-  const OffersScreen({super.key});
+class OffersScreen
+    extends
+        StatelessWidget {
+  const OffersScreen({
+    super.key,
+    this.onOpenNotifications,
+    this.loggedIn = false,
+  });
+
+  final VoidCallback? onOpenNotifications;
+  final bool loggedIn;
+
+  void _handleTap(
+    BuildContext context,
+  ) {
+    if (!loggedIn) {
+      showLoginModal(
+        context,
+      );
+      return;
+    }
+
+    onOpenNotifications?.call();
+  }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
     return ColoredBox(
       color: AppColors.headerNavy,
       child: Column(
         children: [
-          // ================= APP BAR =================
-          const NavyCenterTitleAppBar(
+          NavyCenterTitleAppBar(
             title: 'Tawaranku',
             actions: [
               Padding(
-                padding: EdgeInsets.only(right: 20),
-                child: Icon(
-                  Icons.notifications_none_rounded,
-                  color: Colors.white,
-                  size: 26,
+                padding: const EdgeInsets.only(
+                  right: 20,
+                ),
+                child: GestureDetector(
+                  onTap: () => _handleTap(
+                    context,
+                  ),
+                  child: const Icon(
+                    Icons.notifications_none_rounded,
+                    color: Colors.white,
+                    size: 26,
+                  ),
                 ),
               ),
             ],
           ),
 
-          // ================= WHITE PANEL =================
           Expanded(
             child: Container(
-              margin: const EdgeInsets.only(top: 12),
+              margin: const EdgeInsets.only(
+                top: 12,
+              ),
               decoration: const BoxDecoration(
                 color: AppColors.white,
                 borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(28),
+                  top: Radius.circular(
+                    28,
+                  ),
                 ),
               ),
               child: SingleChildScrollView(
@@ -49,52 +82,47 @@ class OffersScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SearchFieldRounded(),
-
-                    const SizedBox(height: AppSpacing.lg),
                     Text(
                       'Tawaran Pengguna Baru',
                       style: AppTextStyles.sectionTitle,
                     ),
-                    const SizedBox(height: AppSpacing.md),
-
-                    _promoCard(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF60E6D2), Color(0xFF5BB2F6)],
-                      ),
-                      title: 'Diskon 15% untuk Pengguna Baru',
-                      subtitle: 'gunakan kode: SSSd789',
-                      badgeText: '15%\nDiskon',
+                    const SizedBox(
+                      height: AppSpacing.md,
                     ),
 
-                    const SizedBox(height: AppSpacing.xl),
+                    _promoCard(
+                      title: 'Diskon 15% untuk Pengguna Baru',
+                      subtitle: 'gunakan kode: SSSd789',
+                      imagePath: 'assets/images/promo.png',
+                    ),
+
+                    const SizedBox(
+                      height: AppSpacing.xl,
+                    ),
+
                     Text(
                       'Penawaran Khusus',
                       style: AppTextStyles.sectionTitle,
                     ),
-                    const SizedBox(height: AppSpacing.md),
+                    const SizedBox(
+                      height: AppSpacing.md,
+                    ),
 
                     _promoCard(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF5BB2F6), Color(0xFF3ECED0)],
-                      ),
                       title: 'Payday Sale Diskon Rp10.000',
                       subtitle: 'minimal transaksi Rp45.000',
-                      badgeText: 'Payday\nSale',
+                      imagePath: 'assets/images/pay.png',
                     ),
 
-                    const SizedBox(height: AppSpacing.md),
+                    const SizedBox(
+                      height: AppSpacing.md,
+                    ),
 
                     _promoCard(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF3ECED0), Color(0xFF8CD6FF)],
-                      ),
                       title: 'Cuci Bedcover Diskon 10%',
                       subtitle: 'selama bulan Juli',
-                      leadingIcon: Icons.local_laundry_service,
+                      imagePath: 'assets/images/bedcover.png',
                     ),
-
-                    const SizedBox(height: 24),
                   ],
                 ),
               ),
@@ -105,84 +133,126 @@ class OffersScreen extends StatelessWidget {
     );
   }
 
-  // ================= PROMO CARD =================
-
   Widget _promoCard({
-    required LinearGradient gradient,
     required String title,
     required String subtitle,
-    String? badgeText,
-    IconData? leadingIcon,
+    required String imagePath,
   }) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      height: 130,
+      padding: const EdgeInsets.all(
+        14,
+      ),
       decoration: BoxDecoration(
-        gradient: gradient,
-        borderRadius: BorderRadius.circular(20),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(
+              0xFFD2E6FF,
+            ),
+            Color(
+              0xFFAADDEE,
+            ),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(
+          20,
+        ),
       ),
       child: Row(
         children: [
           Expanded(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: AppTextStyles.sectionTitle.copyWith(
-                    color: AppColors.deepNavy,
+                    fontSize: 13,
+                    color: const Color(
+                      0xFF0D1B2A,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(
+                  height: 4,
+                ),
                 Text(
                   subtitle,
                   style: AppTextStyles.bodyMuted.copyWith(
-                    color: AppColors.deepNavy,
+                    fontSize: 12,
+                    color:
+                        const Color(
+                          0xFF0D1B2A,
+                        ).withOpacity(
+                          0.7,
+                        ),
                   ),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(
+                  height: 8,
+                ),
                 SizedBox(
-                  height: 38,
+                  height: 32,
                   child: ElevatedButton(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.deepNavy,
+                      backgroundColor: const Color(
+                        0xFF070066,
+                      ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(
+                          18,
+                        ),
                       ),
                     ),
-                    child: const Text('Gunakan Sekarang'),
+                    child: const Text(
+                      'Gunakan',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 12),
-          if (badgeText != null)
-            _promoBadge(badgeText)
-          else if (leadingIcon != null)
-            Icon(
-              leadingIcon,
-              size: 44,
-              color: AppColors.deepNavy,
-            ),
-        ],
-      ),
-    );
-  }
 
-  Widget _promoBadge(String text) {
-    return Container(
-      width: 64,
-      height: 64,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        text,
-        textAlign: TextAlign.center,
-        style: AppTextStyles.sectionTitle.copyWith(fontSize: 12),
+          const SizedBox(
+            width: 10,
+          ),
+
+          ClipRRect(
+            borderRadius: BorderRadius.circular(
+              14,
+            ),
+            child: Image.asset(
+              imagePath,
+              width: 64,
+              height: 64,
+              fit: BoxFit.cover,
+              errorBuilder:
+                  (
+                    c,
+                    e,
+                    s,
+                  ) => Container(
+                    width: 64,
+                    height: 64,
+                    color: Colors.white24,
+                    child: const Icon(
+                      Icons.image_outlined,
+                    ),
+                  ),
+            ),
+          ),
+        ],
       ),
     );
   }

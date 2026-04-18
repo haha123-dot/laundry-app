@@ -5,7 +5,6 @@ import 'package:wushlaundry/constants/app_spacing.dart';
 import 'package:wushlaundry/constants/app_text_styles.dart';
 import 'package:wushlaundry/widgets/curved_navy_header.dart';
 import 'package:wushlaundry/widgets/labeled_text_field.dart';
-import 'package:wushlaundry/widgets/outline_navy_button.dart';
 import 'package:wushlaundry/widgets/primary_button.dart';
 
 class LoginScreen
@@ -66,8 +65,6 @@ class _LoginScreenState
       'userName',
       namaUser,
     );
-
-    // ✅ TAMBAHAN PENTING (BIAR MUNCUL DI PROFILE)
     await prefs.setString(
       'userEmail',
       email,
@@ -214,51 +211,6 @@ class _LoginScreenState
                     PrimaryButton(
                       label: 'Masuk',
                       onPressed: handleLogin,
-                    ),
-
-                    const SizedBox(
-                      height: AppSpacing.lg,
-                    ),
-
-                    /// DIVIDER
-                    Center(
-                      child: Text(
-                        'ATAU',
-                        style: AppTextStyles.bodyMuted,
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: AppSpacing.lg,
-                    ),
-
-                    /// GOOGLE BUTTON (SUDAH DIHUBUNGKAN KE PROFILE)
-                    OutlineNavyButton(
-                      label: 'Masuk dengan Google',
-                      onPressed: () async {
-                        final prefs = await SharedPreferences.getInstance();
-
-                        await prefs.setBool(
-                          'isLoggedIn',
-                          true,
-                        );
-                        await prefs.setString(
-                          'userName',
-                          'Google User',
-                        );
-                        await prefs.setString(
-                          'userEmail',
-                          'user@gmail.com',
-                        );
-
-                        Navigator.pushNamedAndRemoveUntil(
-                          context,
-                          '/main',
-                          (
-                            route,
-                          ) => false,
-                        );
-                      },
                     ),
 
                     const SizedBox(

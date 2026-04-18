@@ -123,11 +123,14 @@ class WalletLogoBox
           color: color,
         ),
       ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          color: color,
+
+      child: FittedBox(
+        child: Text(
+          label,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
         ),
       ),
     );

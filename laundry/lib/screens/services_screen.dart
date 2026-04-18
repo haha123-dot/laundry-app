@@ -4,68 +4,97 @@ import '../constants/app_spacing.dart';
 import '../constants/app_text_styles.dart';
 import '../widgets/eta_badge.dart';
 import '../widgets/navy_app_bar.dart';
-import '../widgets/search_field_rounded.dart';
+import '../widgets/login_modal_sheet.dart';
 
-class ServicesScreen extends StatelessWidget {
-  const ServicesScreen({super.key});
+class ServicesScreen
+    extends
+        StatelessWidget {
+  const ServicesScreen({
+    super.key,
+    this.onOpenNotifications,
+    this.loggedIn = false,
+  });
+
+  final VoidCallback? onOpenNotifications;
+  final bool loggedIn;
+
+  void _handleTap(
+    BuildContext context,
+    VoidCallback action,
+  ) {
+    if (!loggedIn) {
+      showLoginModal(
+        context,
+      );
+      return;
+    }
+    action();
+  }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
     return Scaffold(
       backgroundColor: AppColors.headerNavy,
 
-      // ================= APP BAR =================
-      appBar: const NavyCenterTitleAppBar(
+      appBar: NavyCenterTitleAppBar(
         title: 'Layanan',
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: 20),
-            child: Icon(
-              Icons.notifications_none_rounded,
-              color: Colors.white,
-              size: 26,
+            padding: const EdgeInsets.only(
+              right: 20,
+            ),
+            child: GestureDetector(
+              onTap: () => _handleTap(
+                context,
+                () => onOpenNotifications?.call(),
+              ),
+              child: const Icon(
+                Icons.notifications_none_rounded,
+                color: Colors.white,
+                size: 26,
+              ),
             ),
           ),
         ],
       ),
 
-      // ================= BODY =================
       body: Container(
         width: double.infinity,
-
-        // ✅ putih turun sedikit dari appbar
-        margin: const EdgeInsets.only(top: 12),
-
+        margin: const EdgeInsets.only(
+          top: 12,
+        ),
         decoration: const BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.vertical(
-            top: Radius.circular(28),
+            top: Radius.circular(
+              28,
+            ),
           ),
         ),
 
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.xl,
-            AppSpacing.xl,
-            AppSpacing.xl,
-            0, // ❌ jangan padding manual di sini
-          ),
-
-          // ✅ INI KUNCI SUPAYA PUTIH NYENTUH NAVBAR
-          child: Padding(
-            padding: const EdgeInsets.only(
-              bottom: kBottomNavigationBarHeight,
+        child: ScrollConfiguration(
+          behavior: const _NoOverscrollBehavior(),
+          child: SingleChildScrollView(
+            physics: const ClampingScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.xl,
+              AppSpacing.xl,
+              AppSpacing.xl,
+              0,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SearchFieldRounded(),
+                Text(
+                  'Layanan Lainnya',
+                  style: AppTextStyles.sectionTitle,
+                ),
+                const SizedBox(
+                  height: AppSpacing.md,
+                ),
 
-                const SizedBox(height: AppSpacing.lg),
-                Text('Layanan Lainnya', style: AppTextStyles.sectionTitle),
-                const SizedBox(height: AppSpacing.md),
-
-                // ================= GRID =================
                 GridView.count(
                   crossAxisCount: 2,
                   shrinkWrap: true,
@@ -80,6 +109,7 @@ class ServicesScreen extends StatelessWidget {
                       price: 'Rp 20.000 / Plastik',
                       eta: 'ETA 10 jam',
                       etaType: EtaType.normal,
+                      imagePath: 'assets/images/cuci.jpg',
                     ),
                     _gridCard(
                       context,
@@ -87,6 +117,7 @@ class ServicesScreen extends StatelessWidget {
                       price: 'Rp 28.000 / Plastik',
                       eta: 'ETA 11 jam',
                       etaType: EtaType.fast,
+                      imagePath: 'assets/images/setrika.jpeg',
                     ),
                     _gridCard(
                       context,
@@ -94,6 +125,7 @@ class ServicesScreen extends StatelessWidget {
                       price: 'Rp 23.000 / Plastik',
                       eta: 'ETA 12 jam',
                       etaType: EtaType.long,
+                      imagePath: 'assets/images/cucikering.jpeg',
                     ),
                     _gridCard(
                       context,
@@ -101,14 +133,42 @@ class ServicesScreen extends StatelessWidget {
                       price: 'Rp 48.000 / Plastik',
                       eta: 'Express',
                       etaType: EtaType.express,
+                      imagePath: 'assets/images/paket.jpg',
+                    ),
+                    _gridCard(
+                      context,
+                      title: 'Cuci Jas / Gaun',
+                      price: 'Rp 23.000 / Plastik',
+                      eta: 'Express',
+                      etaType: EtaType.express,
+                      imagePath: 'assets/images/jas.jpg',
+                    ),
+                    _gridCard(
+                      context,
+                      title: 'Setrika Saja',
+                      price: 'Rp 21.000 / Plastik',
+                      eta: 'ETA 10 jam',
+                      etaType: EtaType.normal,
+                      imagePath: 'assets/images/setrikasaja.jpeg',
                     ),
                   ],
                 ),
 
-                const SizedBox(height: AppSpacing.xl),
+                const SizedBox(
+                  height: AppSpacing.xl,
+                ),
 
-                // ================= BEDCOVER =================
-                _bedcoverCard(context),
+                _bedcoverCard(
+                  context,
+                ),
+
+                const SizedBox(
+                  height: AppSpacing.lg,
+                ),
+
+                _shoesCard(
+                  context,
+                ),
               ],
             ),
           ),
@@ -124,39 +184,66 @@ class ServicesScreen extends StatelessWidget {
     required String price,
     required String eta,
     required EtaType etaType,
+    required String imagePath,
   }) {
     return Material(
       color: AppColors.white,
-      borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+      borderRadius: BorderRadius.circular(
+        AppSpacing.cardRadius,
+      ),
       child: InkWell(
-        onTap: () => Navigator.pushNamed(context, '/service-detail'),
-        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+        onTap: () => _handleTap(
+          context,
+          () => Navigator.pushNamed(
+            context,
+            '/service-detail',
+          ),
+        ),
+        borderRadius: BorderRadius.circular(
+          AppSpacing.cardRadius,
+        ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
               flex: 6,
               child: Stack(
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.serviceCardTint,
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(16),
+                  ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(
+                        16,
                       ),
                     ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.local_laundry_service,
-                        size: 42,
-                        color: AppColors.actionBlue,
-                      ),
+                    child: Image.asset(
+                      imagePath,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder:
+                          (
+                            c,
+                            e,
+                            s,
+                          ) {
+                            return Container(
+                              color: AppColors.serviceCardTint,
+                              child: const Center(
+                                child: Icon(
+                                  Icons.image_outlined,
+                                  size: 42,
+                                  color: AppColors.actionBlue,
+                                ),
+                              ),
+                            );
+                          },
                     ),
                   ),
                   Positioned(
                     top: 8,
                     right: 8,
-                    child: EtaBadge(label: eta, type: etaType),
+                    child: EtaBadge(
+                      label: eta,
+                      type: etaType,
+                    ),
                   ),
                 ],
               ),
@@ -164,19 +251,26 @@ class ServicesScreen extends StatelessWidget {
             Expanded(
               flex: 4,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+                padding: const EdgeInsets.all(
+                  12,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       title,
-                      style: AppTextStyles.sectionTitle.copyWith(fontSize: 13),
+                      style: AppTextStyles.sectionTitle.copyWith(
+                        fontSize: 13,
+                      ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(
+                      height: 4,
+                    ),
                     Text(
                       price,
-                      style: AppTextStyles.caption.copyWith(fontSize: 11),
+                      style: AppTextStyles.caption.copyWith(
+                        fontSize: 11,
+                      ),
                     ),
                   ],
                 ),
@@ -188,19 +282,39 @@ class ServicesScreen extends StatelessWidget {
     );
   }
 
-  // ================= BEDCOVER CARD =================
-  Widget _bedcoverCard(BuildContext context) {
+  // ================= SPECIAL CARD =================
+  Widget _specialCard(
+    BuildContext context, {
+    required String title,
+    required String price,
+    required IconData icon,
+  }) {
     return Material(
-      color: AppColors.white,
-      borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+      borderRadius: BorderRadius.circular(
+        AppSpacing.cardRadius,
+      ),
       child: InkWell(
-        onTap: () => Navigator.pushNamed(context, '/service-detail'),
-        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+        onTap: () => _handleTap(
+          context,
+          () => Navigator.pushNamed(
+            context,
+            '/service-detail',
+          ),
+        ),
+        borderRadius: BorderRadius.circular(
+          AppSpacing.cardRadius,
+        ),
         child: Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(
+            14,
+          ),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
-            border: Border.all(color: AppColors.borderLight),
+            borderRadius: BorderRadius.circular(
+              AppSpacing.cardRadius,
+            ),
+            border: Border.all(
+              color: AppColors.borderLight,
+            ),
           ),
           child: Row(
             children: [
@@ -209,27 +323,37 @@ class ServicesScreen extends StatelessWidget {
                 height: 68,
                 decoration: BoxDecoration(
                   color: AppColors.serviceCardTint,
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(
+                    14,
+                  ),
                 ),
-                child: const Icon(
-                  Icons.local_laundry_service,
+                child: Icon(
+                  icon,
                   size: 34,
                   color: AppColors.actionBlue,
                 ),
               ),
-              const SizedBox(width: 14),
+              const SizedBox(
+                width: 14,
+              ),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Cuci Bedcover / Selimut / Sprei',
-                      style: AppTextStyles.sectionTitle.copyWith(fontSize: 13),
+                      title,
+                      style: AppTextStyles.sectionTitle.copyWith(
+                        fontSize: 13,
+                      ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(
+                      height: 6,
+                    ),
                     Text(
-                      'Mulai Rp45.000',
-                      style: AppTextStyles.bodyMuted.copyWith(fontSize: 12),
+                      price,
+                      style: AppTextStyles.bodyMuted.copyWith(
+                        fontSize: 12,
+                      ),
                     ),
                   ],
                 ),
@@ -244,4 +368,45 @@ class ServicesScreen extends StatelessWidget {
       ),
     );
   }
+
+  Widget _bedcoverCard(
+    BuildContext context,
+  ) {
+    return _specialCard(
+      context,
+      title: 'Cuci Bedcover / Selimut / Sprei',
+      price: 'Rp45.000 / Item',
+      icon: Icons.local_laundry_service,
+    );
+  }
+
+  Widget _shoesCard(
+    BuildContext context,
+  ) {
+    return _specialCard(
+      context,
+      title: 'Cuci Sepatu',
+      price: 'Rp22.000 / Pasang',
+      icon: Icons.directions_walk,
+    );
+  }
+}
+
+// ================= NO OVERSCROLL =================
+class _NoOverscrollBehavior
+    extends
+        ScrollBehavior {
+  const _NoOverscrollBehavior();
+
+  @override
+  Widget buildOverscrollIndicator(
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) => child;
+
+  @override
+  ScrollPhysics getScrollPhysics(
+    BuildContext context,
+  ) => const ClampingScrollPhysics();
 }

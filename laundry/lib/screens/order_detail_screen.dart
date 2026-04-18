@@ -4,73 +4,458 @@ import '../constants/app_spacing.dart';
 import '../constants/app_text_styles.dart';
 import '../widgets/navy_app_bar.dart';
 import '../widgets/rounded_white_panel.dart';
-import '../widgets/service_summary_tile.dart';
 import '../widgets/step_progress_bar.dart';
 
-class OrderDetailScreen extends StatelessWidget {
-  const OrderDetailScreen({super.key});
+class OrderDetailScreen
+    extends
+        StatelessWidget {
+  const OrderDetailScreen({
+    super.key,
+  });
+
+  int _calculateDurationMinutes(
+    String pickup,
+    String delivery,
+  ) {
+    try {
+      final p = DateTime.parse(
+        pickup,
+      );
+      final d = DateTime.parse(
+        delivery,
+      );
+      return d
+          .difference(
+            p,
+          )
+          .inMinutes;
+    } catch (
+      e
+    ) {
+      return 120;
+    }
+  }
+
+  // ================= FORMAT RUPIAH =================
+  String _formatRupiah(
+    int value,
+  ) {
+    final s = value.toString();
+    final buffer = StringBuffer();
+
+    int count = 0;
+    for (
+      int i =
+          s.length -
+          1;
+      i >=
+          0;
+      i--
+    ) {
+      buffer.write(
+        s[i],
+      );
+      count++;
+      if (count %
+                  3 ==
+              0 &&
+          i !=
+              0) {
+        buffer.write(
+          '.',
+        );
+      }
+    }
+
+    return buffer
+        .toString()
+        .split(
+          '',
+        )
+        .reversed
+        .join();
+  }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
+    final args =
+        ModalRoute.of(
+              context,
+            )?.settings.arguments
+            as Map? ??
+        {};
+
+    final int plasticCount =
+        args['qty'] ??
+        1;
+    final String orderId = '001156';
+
+    final String pickupTimeText =
+        args['pickupTime'] ??
+        '-';
+    final String deliveryTimeText =
+        args['deliveryTime'] ??
+        '-';
+
+    final String pickupAddress =
+        args['address'] ??
+        'Alamat belum diisi';
+    final String deliveryAddress =
+        args['deliveryAddress'] ??
+        pickupAddress;
+
+    final String serviceName =
+        args['service'] ??
+        'Cuci Regular';
+
+    final int serviceFee =
+        args['serviceFee'] ??
+        0;
+    final int deliveryFee =
+        args['deliveryFee'] ??
+        0;
+    final int total =
+        args['total'] ??
+        0;
+
+    final int durationMinutes = _calculateDurationMinutes(
+      pickupTimeText,
+      deliveryTimeText,
+    );
+
+    final String durationText =
+        durationMinutes >=
+            60
+        ? '${(durationMinutes / 60).round()} jam'
+        : '$durationMinutes menit';
+
     return Scaffold(
       backgroundColor: AppColors.headerNavy,
       appBar: NavyBackAppBar(
         title: 'Detail Pesanan',
-        onBack: () => Navigator.pop(context),
+        onBack: () => Navigator.pop(
+          context,
+        ),
       ),
       body: Column(
         children: [
-          const SizedBox(height: 8),
+          const SizedBox(
+            height: 8,
+          ),
           Expanded(
             child: RoundedWhitePanel(
-              topRadius: AppSpacing.sheetTopRadius,
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AppSpacing.xl),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Pesanan kamu sedang dicuci', style: AppTextStyles.sectionTitle.copyWith(fontSize: 15)),
-                    const SizedBox(height: 8),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: AppColors.successBg,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          'Diproses',
-                          style: AppTextStyles.caption.copyWith(color: AppColors.success, fontWeight: FontWeight.w700),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const OrderStepProgressBar(activeIndex: 1),
-                    const SizedBox(height: AppSpacing.lg),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: AspectRatio(
-                        aspectRatio: 16 / 9,
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            const ColoredBox(color: Color(0xFFE8EEF5)),
-                            CustomPaint(painter: _MiniMapPainter()),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    _timeline(),
-                    const SizedBox(height: AppSpacing.xl),
-                    const ServiceSummaryTile(
-                      title: 'Cuci regular',
-                      priceLabel: 'Rp 20.000 / Plastik',
-                    ),
-                  ],
-                ),
+              topRadius: 40,
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.xl,
+                AppSpacing.xl,
+                AppSpacing.xl,
+                8,
               ),
+              child:
+                  NotificationListener<
+                    OverscrollIndicatorNotification
+                  >(
+                    onNotification:
+                        (
+                          overscroll,
+                        ) {
+                          overscroll.disallowIndicator();
+                          return true;
+                        },
+                    child: SingleChildScrollView(
+                      physics: const ClampingScrollPhysics(),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // ================= STATUS =================
+                          _box(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        'Pesanan kamu akan segera diambil',
+                                        style: AppTextStyles.sectionTitle.copyWith(
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 5,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.successBg,
+                                        borderRadius: BorderRadius.circular(
+                                          20,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        'Diproses',
+                                        style: AppTextStyles.caption.copyWith(
+                                          color: AppColors.success,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                const SizedBox(
+                                  height: 12,
+                                ),
+
+                                Center(
+                                  child: Text(
+                                    'Pesanan $orderId • $plasticCount plastik • selesai dalam $durationText',
+                                    textAlign: TextAlign.center,
+                                    style: AppTextStyles.caption.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(
+                                  height: 16,
+                                ),
+
+                                const OrderStepProgressBar(
+                                  activeIndex: 0,
+                                ),
+
+                                const SizedBox(
+                                  height: 16,
+                                ),
+
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(
+                                    16,
+                                  ),
+                                  child: AspectRatio(
+                                    aspectRatio:
+                                        16 /
+                                        9,
+                                    child: Image.asset(
+                                      'assets/images/map_dummy.png',
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(
+                                  height: 14,
+                                ),
+
+                                Row(
+                                  children: const [
+                                    Icon(
+                                      Icons.location_on,
+                                      color: Colors.red,
+                                      size: 18,
+                                    ),
+                                    SizedBox(
+                                      width: 6,
+                                    ),
+                                    Text(
+                                      'Titik Penjemputan',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                const SizedBox(
+                                  height: 4,
+                                ),
+
+                                Text(
+                                  pickupAddress,
+                                  style: AppTextStyles.body,
+                                ),
+
+                                const SizedBox(
+                                  height: 10,
+                                ),
+
+                                Column(
+                                  children: List.generate(
+                                    3,
+                                    (
+                                      index,
+                                    ) => const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 1,
+                                      ),
+                                      child: Text(
+                                        '•',
+                                        style: TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 14,
+                                          height: 0.7,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(
+                                  height: 10,
+                                ),
+
+                                Row(
+                                  children: const [
+                                    Icon(
+                                      Icons.location_on,
+                                      color: Colors.green,
+                                      size: 18,
+                                    ),
+                                    SizedBox(
+                                      width: 6,
+                                    ),
+                                    Text(
+                                      'Titik Pengantaran',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                const SizedBox(
+                                  height: 4,
+                                ),
+
+                                Text(
+                                  deliveryAddress,
+                                  style: AppTextStyles.bodyMuted,
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(
+                            height: 20,
+                          ),
+
+                          // ================= DETAIL =================
+                          _box(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(
+                                        12,
+                                      ),
+                                      child: Container(
+                                        width: 64,
+                                        height: 64,
+                                        color: const Color(
+                                          0xFFECECEC,
+                                        ),
+                                        child: const Icon(
+                                          Icons.local_laundry_service,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 12,
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            serviceName,
+                                            style: AppTextStyles.sectionTitle,
+                                          ),
+                                          const SizedBox(
+                                            height: 6,
+                                          ),
+                                          Text(
+                                            'Rp 20.000 / plastik',
+                                            style: AppTextStyles.bodyMuted,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                const SizedBox(
+                                  height: 16,
+                                ),
+                                const Divider(),
+
+                                _row(
+                                  'Waktu Pengambilan',
+                                  pickupTimeText,
+                                ),
+                                const Divider(),
+
+                                _row(
+                                  'Waktu Pengiriman',
+                                  deliveryTimeText,
+                                ),
+                                const Divider(),
+
+                                _row(
+                                  'Alamat Pengiriman',
+                                  deliveryAddress,
+                                ),
+                                const Divider(),
+
+                                const SizedBox(
+                                  height: 10,
+                                ),
+
+                                Text(
+                                  'Detail Pembayaran',
+                                  style: AppTextStyles.sectionTitle,
+                                ),
+
+                                const SizedBox(
+                                  height: 10,
+                                ),
+
+                                _row(
+                                  'Biaya Layanan',
+                                  'Rp ${_formatRupiah(serviceFee)}',
+                                ),
+                                _row(
+                                  'Biaya Pengiriman',
+                                  'Rp ${_formatRupiah(deliveryFee)}',
+                                ),
+                                _row(
+                                  'Kode Promo',
+                                  '-',
+                                ),
+
+                                const Divider(),
+
+                                _row(
+                                  'Total Pembayaran',
+                                  'Rp ${_formatRupiah(total)}',
+                                  bold: true,
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(
+                            height: 20,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
             ),
           ),
         ],
@@ -78,64 +463,53 @@ class OrderDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _timeline() {
-    return Column(
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Column(
-              children: [
-                Container(
-                  width: 12,
-                  height: 12,
-                  decoration: const BoxDecoration(color: AppColors.actionBlue, shape: BoxShape.circle),
-                ),
-                Container(width: 2, height: 40, color: AppColors.borderLight),
-                Container(
-                  width: 12,
-                  height: 12,
-                  decoration: const BoxDecoration(color: AppColors.success, shape: BoxShape.circle),
-                ),
-              ],
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Titik Penjemputan', style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w700)),
-                  Text('Jl. Kenanga No. 10', style: AppTextStyles.bodyMuted),
-                  const SizedBox(height: 20),
-                  Text('Titik Pengiriman', style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w700)),
-                  Text('Jln. Matahari no. 456', style: AppTextStyles.bodyMuted),
-                ],
-              ),
-            ),
-          ],
+  Widget _box({
+    required Widget child,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(
+        16,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(
+          16,
         ),
-      ],
+        border: Border.all(
+          color: AppColors.borderLight,
+        ),
+      ),
+      child: child,
     );
   }
-}
 
-class _MiniMapPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final route = Paint()
-      ..color = AppColors.actionBlue
-      ..strokeWidth = 3
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-    final path = Path()
-      ..moveTo(size.width * 0.2, size.height * 0.72)
-      ..quadraticBezierTo(size.width * 0.45, size.height * 0.35, size.width * 0.78, size.height * 0.48);
-    canvas.drawPath(path, route);
-    final pin = Paint()..color = Colors.redAccent;
-    canvas.drawCircle(Offset(size.width * 0.22, size.height * 0.72), 6, pin);
-    canvas.drawCircle(Offset(size.width * 0.78, size.height * 0.48), 6, pin);
+  Widget _row(
+    String title,
+    String value, {
+    bool bold = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        vertical: 8,
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              style: bold
+                  ? AppTextStyles.sectionTitle
+                  : AppTextStyles.body,
+            ),
+          ),
+          Text(
+            value,
+            style: bold
+                ? AppTextStyles.sectionTitle
+                : AppTextStyles.body,
+          ),
+        ],
+      ),
+    );
   }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

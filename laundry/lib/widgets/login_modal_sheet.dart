@@ -2,74 +2,106 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_spacing.dart';
 import '../constants/app_text_styles.dart';
-import 'info_kv_row.dart';
-import 'outline_navy_button.dart';
 import 'primary_button.dart';
 
-void showLoginModal(BuildContext context) {
+void
+showLoginModal(
+  BuildContext context,
+) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
-    isDismissible: true, // ✅ tap di mana saja bisa tutup
-    enableDrag: true,    // ✅ swipe ke bawah
+    isDismissible: true,
+    enableDrag: true,
     backgroundColor: Colors.transparent,
-    builder: (_) => const _LoginModalCard(),
+    builder:
+        (
+          _,
+        ) => const _LoginModalCard(),
   );
 }
 
-class _LoginModalCard extends StatelessWidget {
+class _LoginModalCard
+    extends
+        StatelessWidget {
   const _LoginModalCard();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
     return Padding(
       padding: EdgeInsets.only(
         left: AppSpacing.xl,
         right: AppSpacing.xl,
-        bottom: MediaQuery.paddingOf(context).bottom + AppSpacing.xl,
+        bottom:
+            MediaQuery.paddingOf(
+              context,
+            ).bottom +
+            AppSpacing.xl,
       ),
       child: Center(
         child: Material(
           color: AppColors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(
+            20,
+          ),
           child: Stack(
             children: [
-              // ====== TOMBOL X ======
+              // ====== TOMBOL CLOSE ======
               Positioned(
                 top: 8,
                 right: 8,
                 child: IconButton(
-                  icon: const Icon(Icons.close),
+                  icon: const Icon(
+                    Icons.close,
+                  ),
                   color: AppColors.textMuted,
                   onPressed: () {
-                    Navigator.pop(context); // ✅ BALIK KE HOME
+                    Navigator.pop(
+                      context,
+                    );
                   },
                 ),
               ),
 
-              // ====== ISI MODAL ======
+              // ====== CONTENT ======
               Padding(
-                padding: const EdgeInsets.all(AppSpacing.xxl),
+                padding: const EdgeInsets.all(
+                  AppSpacing.xxl,
+                ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const SizedBox(height: 8),
+                    const SizedBox(
+                      height: 8,
+                    ),
+
                     Text(
                       'Masuk ke Akun Anda',
                       textAlign: TextAlign.center,
-                      style:
-                          AppTextStyles.sectionTitle.copyWith(fontSize: 18),
+                      style: AppTextStyles.sectionTitle.copyWith(
+                        fontSize: 18,
+                      ),
                     ),
-                    const SizedBox(height: 10),
+
+                    const SizedBox(
+                      height: 10,
+                    ),
+
                     Text(
                       'Anda harus masuk terlebih dahulu untuk melanjutkan tindakan ini.',
                       textAlign: TextAlign.center,
                       style: AppTextStyles.bodyMuted,
                     ),
-                    const SizedBox(height: 22),
 
+                    const SizedBox(
+                      height: 22,
+                    ),
+
+                    // ====== LOGIN EMAIL ======
                     PrimaryButton(
                       label: 'Masuk dengan Email',
                       leading: const Icon(
@@ -78,29 +110,37 @@ class _LoginModalCard extends StatelessWidget {
                         size: 22,
                       ),
                       onPressed: () {
-                        Navigator.pop(context);
-                        Navigator.pushNamed(context, '/login');
+                        Navigator.pop(
+                          context,
+                        );
+                        Navigator.pushNamed(
+                          context,
+                          '/login',
+                        );
                       },
                     ),
 
-                    const SizedBox(height: 12),
-
-                    OutlineNavyButton(
-                      label: 'Masuk dengan Google',
-                      leading: _googleMini(),
-                      onPressed: () {},
+                    const SizedBox(
+                      height: 16,
                     ),
 
-                    const SizedBox(height: 16),
-                    const PaymentDividerLabel(label: 'ATAU'),
-                    const SizedBox(height: 16),
-
+                    // ====== SIGN UP ======
                     PrimaryButton(
                       label: 'Sign Up',
                       backgroundColor: AppColors.accentBlue,
+                      leading: const Icon(
+                        Icons.person_add_alt_1_rounded,
+                        color: AppColors.white,
+                        size: 22,
+                      ),
                       onPressed: () {
-                        Navigator.pop(context);
-                        Navigator.pushNamed(context, '/register');
+                        Navigator.pop(
+                          context,
+                        );
+                        Navigator.pushNamed(
+                          context,
+                          '/register',
+                        );
                       },
                     ),
                   ],
@@ -108,25 +148,6 @@ class _LoginModalCard extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _googleMini() {
-    return Container(
-      width: 22,
-      height: 22,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: AppColors.borderLight),
-      ),
-      child: Text(
-        'G',
-        style: AppTextStyles.sectionTitle.copyWith(
-          fontSize: 13,
-          color: Colors.redAccent,
         ),
       ),
     );

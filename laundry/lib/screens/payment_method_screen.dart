@@ -15,6 +15,13 @@ class PaymentMethodScreen
   Widget build(
     BuildContext context,
   ) {
+    final args =
+        ModalRoute.of(
+              context,
+            )?.settings.arguments
+            as Map? ??
+        {};
+
     return Scaffold(
       backgroundColor: AppColors.pageBg,
       appBar: AppBar(
@@ -29,159 +36,97 @@ class PaymentMethodScreen
           color: AppColors.headerNavy,
         ),
       ),
-      body: Stack(
+      body: ListView(
+        padding: const EdgeInsets.all(
+          AppSpacing.xl,
+        ),
         children: [
-          ListView(
-            padding: const EdgeInsets.all(
-              AppSpacing.xl,
+          PaymentMethodTile(
+            title: 'DANA',
+            connected: true,
+            leading: const WalletLogoBox(
+              label: 'D',
+              color: Color(
+                0xFF118EEA,
+              ),
             ),
-            children: [
-              PaymentMethodTile(
-                title: 'DANA',
-                connected: true,
-                leading: const WalletLogoBox(
-                  label: 'D',
-                  color: Color(
-                    0xFF118EEA,
-                  ),
-                ),
-                onTap: () => Navigator.pushNamed(
-                  context,
-                  '/pin',
-                  arguments: 'DANA',
-                ),
-              ),
-
-              const SizedBox(
-                height: 12,
-              ),
-
-              PaymentMethodTile(
-                title: 'OVO',
-                connected: true,
-                leading: const WalletLogoBox(
-                  label: 'O',
-                  color: Color(
-                    0xFF6B2C91,
-                  ),
-                ),
-                onTap: () => Navigator.pushNamed(
-                  context,
-                  '/pin',
-                  arguments: 'OVO',
-                ),
-              ),
-
-              const SizedBox(
-                height: 12,
-              ),
-
-              const PaymentMethodTile(
-                title: 'BCA',
-                leading: WalletLogoBox(
-                  label: 'B',
-                  color: AppColors.headerNavy,
-                ),
-              ),
-
-              const SizedBox(
-                height: 12,
-              ),
-
-              const PaymentMethodTile(
-                title: 'BNI',
-                leading: WalletLogoBox(
-                  label: 'N',
-                  color: Color(
-                    0xFF00529C,
-                  ),
-                ),
-              ),
-
-              const SizedBox(
-                height: 12,
-              ),
-
-              const PaymentMethodTile(
-                title: 'Mandiri',
-                leading: WalletLogoBox(
-                  label: 'M',
-                  color: Color(
-                    0xFFFF6B00,
-                  ),
-                ),
-              ),
-            ],
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                '/pin',
+                arguments: {
+                  'wallet': 'DANA',
+                  'order': args, // 🔥 PASS ORDER
+                },
+              );
+            },
           ),
 
-          Positioned(
-            right: 16,
-            bottom:
-                MediaQuery.paddingOf(
-                  context,
-                ).bottom +
-                16,
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 8,
+          const SizedBox(
+            height: 12,
+          ),
+
+          PaymentMethodTile(
+            title: 'OVO',
+            connected: true,
+            leading: const WalletLogoBox(
+              label: 'O',
+              color: Color(
+                0xFF6B2C91,
               ),
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.circular(
-                  24,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(
-                      0.12,
-                    ),
-                    blurRadius: 12,
-                  ),
-                ],
+            ),
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                '/pin',
+                arguments: {
+                  'wallet': 'OVO',
+                  'order': args,
+                },
+              );
+            },
+          ),
+
+          const SizedBox(
+            height: 12,
+          ),
+
+          const PaymentMethodTile(
+            title: 'BCA',
+            leading: WalletLogoBox(
+              label: 'B',
+              color: AppColors.headerNavy,
+            ),
+          ),
+
+          const SizedBox(
+            height: 12,
+          ),
+
+          const PaymentMethodTile(
+            title: 'BNI',
+            leading: WalletLogoBox(
+              label: 'N',
+              color: Color(
+                0xFF00529C,
               ),
-              child: Row(
-                children: [
-                  _avatar(
-                    'N',
-                  ),
-                  const SizedBox(
-                    width: -6,
-                  ),
-                  _avatar(
-                    'A',
-                  ),
-                ],
+            ),
+          ),
+
+          const SizedBox(
+            height: 12,
+          ),
+
+          const PaymentMethodTile(
+            title: 'Mandiri',
+            leading: WalletLogoBox(
+              label: 'M',
+              color: Color(
+                0xFFFF6B00,
               ),
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _avatar(
-    String l,
-  ) {
-    return Container(
-      width: 32,
-      height: 32,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: AppColors.accentBlue.withOpacity(
-          0.2,
-        ),
-        border: Border.all(
-          color: AppColors.white,
-          width: 2,
-        ),
-      ),
-      child: Text(
-        l,
-        style: AppTextStyles.sectionTitle.copyWith(
-          fontSize: 13,
-        ),
       ),
     );
   }

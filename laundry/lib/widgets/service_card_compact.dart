@@ -12,7 +12,7 @@ class ServiceCardCompact
     required this.title,
     required this.priceLabel,
     required this.etaLabel,
-    this.etaType = EtaType.normal, // ✅ SATU-SATUNYA sumber warna ETA
+    this.etaType = EtaType.normal,
     this.selected = false,
     this.icon = Icons.local_laundry_service_outlined,
     this.onTap,
@@ -81,7 +81,7 @@ class ServiceCardCompact
                   const Spacer(),
                   EtaBadge(
                     label: etaLabel,
-                    type: etaType, // ✅ VALID & TIDAK ERROR
+                    type: etaType,
                   ),
                 ],
               ),
@@ -104,63 +104,6 @@ class ServiceCardCompact
                 ),
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// ================= PANAH KE SEMUA LAYANAN =================
-
-class ServiceNextCard
-    extends
-        StatelessWidget {
-  const ServiceNextCard({
-    super.key,
-    this.onTap,
-  });
-
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(
-    BuildContext context,
-  ) {
-    return Material(
-      color: AppColors.white,
-      borderRadius: BorderRadius.circular(
-        AppSpacing.cardRadius,
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(
-          AppSpacing.cardRadius,
-        ),
-        child: Container(
-          width: 56,
-          height: 120,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(
-              AppSpacing.cardRadius,
-            ),
-            border: Border.all(
-              color: AppColors.borderLight,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(
-                  0.04,
-                ),
-                blurRadius: 8,
-              ),
-            ],
-          ),
-          child: const Icon(
-            Icons.arrow_forward_ios_rounded,
-            color: AppColors.actionBlue,
-            size: 20,
           ),
         ),
       ),
