@@ -239,7 +239,7 @@ class SettingsScreen
               style: AppTextStyles.sectionTitle,
             ),
             content: Text(
-              'Akun akan keluar dari sistem (simulasi).',
+              'Apakah kamu yakin ingin menghapus akun ini? Semua data akan hilang dan tidak bisa dikembalikan.',
               style: AppTextStyles.bodyMuted,
             ),
             actions: [

@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:wushlaundry/widgets/active_order_card.dart';
 import 'package:wushlaundry/widgets/eta_badge.dart';
 import 'package:wushlaundry/widgets/login_modal_sheet.dart';
@@ -7,6 +9,7 @@ import 'package:wushlaundry/widgets/offer_image_slider.dart';
 import 'package:wushlaundry/widgets/rounded_white_panel.dart';
 import 'package:wushlaundry/widgets/section_header_row.dart';
 import 'package:wushlaundry/widgets/service_card_compact.dart';
+
 import '../constants/app_colors.dart';
 import '../constants/app_spacing.dart';
 import '../constants/app_text_styles.dart';
@@ -50,6 +53,11 @@ class _HomeScreenState
   int _currentIndex = 0;
   Timer? _timer;
 
+  // 🔥 ACTIVE ORDER STATE
+  bool hasOrder = false;
+  String orderTitle = '';
+  String orderSubtitle = '';
+
   final List<
     Map<
       String,
@@ -87,6 +95,8 @@ class _HomeScreenState
   void initState() {
     super.initState();
 
+    loadActiveOrder();
+
     _timer = Timer.periodic(
       const Duration(
         seconds: 3,
@@ -114,6 +124,72 @@ class _HomeScreenState
             _currentIndex = next;
           },
         );
+      },
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    loadActiveOrder(); // refresh saat balik ke home
+  }
+
+  // 🔥 LOAD ORDER + VALIDASI
+  Future<
+    void
+  >
+  loadActiveOrder() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final isLogin =
+        prefs.getBool(
+          'isLoggedIn',
+        ) ??
+        false;
+
+    // ❌ belum login → kosong
+    if (!isLogin) {
+      setState(
+        () => hasOrder = false,
+      );
+      return;
+    }
+
+    final service = prefs.getString(
+      'active_order_service',
+    );
+    final qty = prefs.getInt(
+      'active_order_qty',
+    );
+    final pickup = prefs.getString(
+      'active_order_pickup',
+    );
+    final delivery = prefs.getString(
+      'active_order_delivery',
+    );
+
+    // ❌ belum order / data ga lengkap
+    if (service ==
+            null ||
+        service.isEmpty ||
+        qty ==
+            null ||
+        pickup ==
+            null ||
+        delivery ==
+            null) {
+      setState(
+        () => hasOrder = false,
+      );
+      return;
+    }
+
+    // ✅ tampilkan
+    setState(
+      () {
+        hasOrder = true;
+        orderTitle = 'Pesanan kamu sedang diproses';
+        orderSubtitle = '$service • $qty plastik\nPickup: $pickup\nDelivery: $delivery';
       },
     );
   }
@@ -193,8 +269,6 @@ class _HomeScreenState
                 AppSpacing.xl,
                 8,
               ),
-
-              /// ✅ FIX SCROLL DI SINI
               child: ScrollConfiguration(
                 behavior: const _NoOverscrollBehavior(),
                 child: SingleChildScrollView(
@@ -228,7 +302,6 @@ class _HomeScreenState
                         height: 140,
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
-                          physics: const BouncingScrollPhysics(),
                           itemCount: items.length,
                           itemBuilder:
                               (
@@ -236,7 +309,6 @@ class _HomeScreenState
                                 index,
                               ) {
                                 final item = items[index];
-
                                 return Padding(
                                   padding: const EdgeInsets.only(
                                     right: 12,
@@ -270,13 +342,20 @@ class _HomeScreenState
                         height: 12,
                       ),
 
-                      /// 🔥 NANTI BISA GANTI JADI DINAMIS
-                      const ActiveOrderCard(
-                        empty: true,
-                        statusTitle: '',
-                        subtitle: '',
-                        currentStep: 0,
-                        onTap: null,
+                      // 🔥 AUTO EMPTY / ADA
+                      ActiveOrderCard(
+                        empty: !hasOrder,
+                        statusTitle: orderTitle,
+                        subtitle: orderSubtitle,
+                        currentStep: 1,
+                        onTap: hasOrder
+                            ? () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/order-detail',
+                                );
+                              }
+                            : null,
                       ),
 
                       const SizedBox(

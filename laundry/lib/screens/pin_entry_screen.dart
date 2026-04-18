@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_spacing.dart';
 import '../constants/app_text_styles.dart';
@@ -52,6 +53,43 @@ class _PinEntryScreenState
     );
   }
 
+  // 🔥 FINAL SAVE ORDER
+  Future<
+    void
+  >
+  saveOrder(
+    Map order,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // FLAG WAJIB
+    await prefs.setBool(
+      'active_order_exists',
+      true,
+    );
+
+    await prefs.setString(
+      'active_order_service',
+      order['service'] ??
+          '',
+    );
+    await prefs.setInt(
+      'active_order_qty',
+      order['qty'] ??
+          1,
+    );
+    await prefs.setString(
+      'active_order_pickup',
+      order['pickupTime'] ??
+          '',
+    );
+    await prefs.setString(
+      'active_order_delivery',
+      order['deliveryTime'] ??
+          '',
+    );
+  }
+
   @override
   Widget build(
     BuildContext context,
@@ -62,7 +100,6 @@ class _PinEntryScreenState
             )?.settings.arguments
             as Map? ??
         {};
-
     final orderData =
         args['order'] ??
         {};
@@ -72,32 +109,12 @@ class _PinEntryScreenState
       appBar: AppBar(
         backgroundColor: AppColors.white,
         elevation: 0,
-        leading: TextButton.icon(
-          onPressed: () => Navigator.pop(
-            context,
-          ),
-          icon: const Icon(
-            Icons.chevron_left,
-            color: AppColors.headerNavy,
-            size: 28,
-          ),
-          label: Text(
-            'Kembali',
-            style: AppTextStyles.link.copyWith(
-              fontSize: 15,
-            ),
-          ),
-        ),
-        leadingWidth: 100,
         title: Text(
-          'Masukkan PIN ${widget.walletName} Anda',
-          style: AppTextStyles.screenTitleNavy.copyWith(
-            fontSize: 15,
-          ),
+          'Masukkan PIN ${widget.walletName}',
+          style: AppTextStyles.screenTitleNavy,
         ),
         centerTitle: true,
       ),
-
       body: Column(
         children: [
           const SizedBox(
@@ -114,7 +131,6 @@ class _PinEntryScreenState
                 final filled =
                     i <
                     _digits.length;
-
                 return Container(
                   margin: const EdgeInsets.symmetric(
                     horizontal: 6,
@@ -155,15 +171,18 @@ class _PinEntryScreenState
             child: PrimaryButton(
               label: 'Konfirmasi',
               backgroundColor: AppColors.actionBlue,
-
               onPressed:
                   _digits.length ==
                       6
-                  ? () {
+                  ? () async {
+                      await saveOrder(
+                        orderData,
+                      );
+
                       Navigator.pushReplacementNamed(
                         context,
                         '/order-detail',
-                        arguments: orderData, // 🔥 FULL DATA MASUK
+                        arguments: orderData,
                       );
                     }
                   : null,

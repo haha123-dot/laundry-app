@@ -6,6 +6,9 @@ import '../widgets/navy_app_bar.dart';
 import '../widgets/rounded_white_panel.dart';
 import '../widgets/step_progress_bar.dart';
 
+// 🔥 TAMBAHAN IMPORT (WAJIB)
+import '../screens/main_shell_screen.dart';
+
 class OrderDetailScreen
     extends
         StatelessWidget {
@@ -36,7 +39,6 @@ class OrderDetailScreen
     }
   }
 
-  // ================= FORMAT RUPIAH =================
   String _formatRupiah(
     int value,
   ) {
@@ -135,9 +137,22 @@ class OrderDetailScreen
       backgroundColor: AppColors.headerNavy,
       appBar: NavyBackAppBar(
         title: 'Detail Pesanan',
-        onBack: () => Navigator.pop(
-          context,
-        ),
+
+        // 🔥 FIX FINAL (PASTI WORK)
+        onBack: () {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder:
+                  (
+                    _,
+                  ) => const MainShellScreen(),
+            ),
+            (
+              route,
+            ) => false,
+          );
+        },
       ),
       body: Column(
         children: [
@@ -169,7 +184,6 @@ class OrderDetailScreen
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // ================= STATUS =================
                           _box(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,11 +219,9 @@ class OrderDetailScreen
                                     ),
                                   ],
                                 ),
-
                                 const SizedBox(
                                   height: 12,
                                 ),
-
                                 Center(
                                   child: Text(
                                     'Pesanan $orderId • $plasticCount plastik • selesai dalam $durationText',
@@ -219,19 +231,15 @@ class OrderDetailScreen
                                     ),
                                   ),
                                 ),
-
                                 const SizedBox(
                                   height: 16,
                                 ),
-
                                 const OrderStepProgressBar(
                                   activeIndex: 0,
                                 ),
-
                                 const SizedBox(
                                   height: 16,
                                 ),
-
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(
                                     16,
@@ -246,11 +254,9 @@ class OrderDetailScreen
                                     ),
                                   ),
                                 ),
-
                                 const SizedBox(
                                   height: 14,
                                 ),
-
                                 Row(
                                   children: const [
                                     Icon(
@@ -269,20 +275,16 @@ class OrderDetailScreen
                                     ),
                                   ],
                                 ),
-
                                 const SizedBox(
                                   height: 4,
                                 ),
-
                                 Text(
                                   pickupAddress,
                                   style: AppTextStyles.body,
                                 ),
-
                                 const SizedBox(
                                   height: 10,
                                 ),
-
                                 Column(
                                   children: List.generate(
                                     3,
@@ -303,11 +305,9 @@ class OrderDetailScreen
                                     ),
                                   ),
                                 ),
-
                                 const SizedBox(
                                   height: 10,
                                 ),
-
                                 Row(
                                   children: const [
                                     Icon(
@@ -326,11 +326,9 @@ class OrderDetailScreen
                                     ),
                                   ],
                                 ),
-
                                 const SizedBox(
                                   height: 4,
                                 ),
-
                                 Text(
                                   deliveryAddress,
                                   style: AppTextStyles.bodyMuted,
@@ -338,12 +336,9 @@ class OrderDetailScreen
                               ],
                             ),
                           ),
-
                           const SizedBox(
                             height: 20,
                           ),
-
-                          // ================= DETAIL =================
                           _box(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -388,43 +383,35 @@ class OrderDetailScreen
                                     ),
                                   ],
                                 ),
-
                                 const SizedBox(
                                   height: 16,
                                 ),
                                 const Divider(),
-
                                 _row(
                                   'Waktu Pengambilan',
                                   pickupTimeText,
                                 ),
                                 const Divider(),
-
                                 _row(
                                   'Waktu Pengiriman',
                                   deliveryTimeText,
                                 ),
                                 const Divider(),
-
                                 _row(
                                   'Alamat Pengiriman',
                                   deliveryAddress,
                                 ),
                                 const Divider(),
-
                                 const SizedBox(
                                   height: 10,
                                 ),
-
                                 Text(
                                   'Detail Pembayaran',
                                   style: AppTextStyles.sectionTitle,
                                 ),
-
                                 const SizedBox(
                                   height: 10,
                                 ),
-
                                 _row(
                                   'Biaya Layanan',
                                   'Rp ${_formatRupiah(serviceFee)}',
@@ -437,9 +424,7 @@ class OrderDetailScreen
                                   'Kode Promo',
                                   '-',
                                 ),
-
                                 const Divider(),
-
                                 _row(
                                   'Total Pembayaran',
                                   'Rp ${_formatRupiah(total)}',
@@ -448,7 +433,6 @@ class OrderDetailScreen
                               ],
                             ),
                           ),
-
                           const SizedBox(
                             height: 20,
                           ),
